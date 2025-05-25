@@ -1,0 +1,15 @@
+<h4>OctoPiWifi <small>{{ _('Version') }} {{ plugin_octopiwifi_plugin_version }}</small></h4>
+<form class="form-horizontal">
+    <div class="control-group">
+        <label class="control-label">{{ _('SSID') }}</label>
+        <div class="controls">
+            <select class="input-large" id="selected_ssid" data-bind="options: available_networks, value: selected_SSID, allowUnset: true"></select>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">{{ _('WPA Key') }}</label>
+        <div class="controls input-append">
+            <input class="input-large" id="wifi_key" type="password" data-bind="value: wifi_key"><button class="btn add-on" type="button" data-bind="click: add_wifi, disable: processing">{{ _('Add Wifi') }}</button>
+        </div>
+    </div>
+</form>
