@@ -58,49 +58,48 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
     # ~~ Functions
 
     def scan_wifi_networks(self):
-        iwlist_raw = subprocess.Popen(["iwlist", "scan"], stdout=subprocess.PIPE)
+        iwlist_raw = subprocess.Popen(["sudo", "iwlist", "scan"], stdout=subprocess.PIPE)
         ap_list, err = iwlist_raw.communicate()
         ap_array = []
 
         for line in ap_list.decode("utf-8").rsplit("\n"):
             if "ESSID" in line:
                 ap_ssid = line[27:-1]
-                if ap_ssid != "":
+                if ap_ssid != "" and ap_ssid not in ap_array:
                     ap_array.append(ap_ssid)
-
-        ap_array.append("AP mode")
 
         return ap_array
 
     def create_nm_connection(self, ssid, wifi_key):
         try:
             if os.path.exists(f"/etc/NetworkManager/system-connections/{ssid}.nmconnection"):
-                os.system(f"nmcli con delete \"{ssid}\"")
+                os.system(f"sudo nmcli con delete \"{ssid}\"")
 
-            os.system(f"nmcli con add type wifi ifname wlan0 mode infrastructure con-name \"{ssid}\" ssid \"{ssid}\" autoconnect true")
+            os.system(
+                f"sudo nmcli con add type wifi ifname wlan0 mode infrastructure con-name \"{ssid}\" ssid \"{ssid}\" autoconnect true")
 
             if wifi_key == "":
-                os.system(f"nmcli con modify \"{ssid}\" wifi-sec.key-mgmt none")
+                os.system(f"sudo nmcli con modify \"{ssid}\" wifi-sec.key-mgmt none")
             else:
-                os.system(f"nmcli con modify \"{ssid}\" wifi-sec.key-mgmt wpa-psk")
-                os.system(f"nmcli con modify \"{ssid}\" wifi-sec.psk \"{wifi_key}\"")
+                os.system(f"sudo nmcli con modify \"{ssid}\" wifi-sec.key-mgmt wpa-psk")
+                os.system(f"sudo nmcli con modify \"{ssid}\" wifi-sec.psk \"{wifi_key}\"")
                 return flask.jsonify(success=f"Created nm connection: {ssid}")
         except exception as e:
             self._logger.error(f"Error creating nm connection: {e}")
             return flask.jsonify(error=f"Error creating nm connection: {e}")
 
     def set_ap_host_mode(self):
-        os.system("nmcli con up OctoPiWiFi")
+        os.system("sudo nmcli con up OctoPiWiFi")
 
     def set_ap_client_mode(self, ssid):
-        os.system(f"nmcli con up \"{ssid}\"")
+        os.system(f"sudo nmcli con up \"{ssid}\"")
 
     def update_wpa(self, wpa_key):
         if not wpa_key == "":
-            os.system("nmcli con modify OctoPiWiFi wifi-sec.key-mgmt wpa-psk")
-            os.system(f"nmcli con modify OctoPiWiFi wifi-sec.psk \"{wpa_key}\"")
+            os.system("sudo nmcli con modify OctoPiWiFi wifi-sec.key-mgmt wpa-psk")
+            os.system(f"sudo nmcli con modify OctoPiWiFi wifi-sec.psk \"{wpa_key}\"")
         else:
-            os.system("nmcli con modify OctoPiWiFi wifi-sec.key-mgmt none")
+            os.system("sudo nmcli con modify OctoPiWiFi wifi-sec.key-mgmt none")
 
     # ~~ Softwareupdate hook
 
