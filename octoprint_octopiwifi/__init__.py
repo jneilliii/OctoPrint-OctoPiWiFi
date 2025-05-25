@@ -83,7 +83,7 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
             else:
                 os.system(f"sudo nmcli con modify \"{ssid}\" wifi-sec.key-mgmt wpa-psk")
                 os.system(f"sudo nmcli con modify \"{ssid}\" wifi-sec.psk \"{wifi_key}\"")
-                return flask.jsonify(success=f"Created nm connection: {ssid}")
+            return flask.jsonify(success=f"Created nm connection: {ssid}")
         except exception as e:
             self._logger.error(f"Error creating nm connection: {e}")
             return flask.jsonify(error=f"Error creating nm connection: {e}")
