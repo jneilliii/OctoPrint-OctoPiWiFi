@@ -25,11 +25,16 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
         return True
 
     def get_api_commands(self):
-        return {'create_nm_connection': ["ssid", "wifi_key"], 'set_ap_host_mode': [], 'set_ap_client_mode': ["ssid"],
+        return {'create_nm_connection': ["ssid", "wifi_key"], 'delete_nm_connection': ["ssid"], 'set_ap_host_mode': [], 'set_ap_client_mode': ["ssid"],
                 'update_wpa': ["wpa_key"]}
 
     def on_api_get(self, request):
-        return flask.jsonify(available_networks=self.scan_wifi_networks())
+        if request.args.get("list_nm_connections"):
+            return flask.jsonify(saved_connections=self.list_nm_connections())
+        elif request.args.get("scan_wifi_networks"):
+            return flask.jsonify(available_networks=self.scan_wifi_networks())
+        else:
+            return flask.jsonify(error="Invalid request")
 
     def on_api_command(self, command, data):
         if command == "create_nm_connection":
@@ -40,6 +45,8 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
             return self.set_ap_client_mode(data["ssid"])
         elif command == "update_wpa":
             return self.update_wpa(data["wpa_key"])
+        elif command == "delete_nm_connection":
+            return self.delete_nm_connection(data["ssid"])
         else:
             return None
 
@@ -52,10 +59,24 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
 
     def get_assets(self):
         return {
-            "js": ["js/octopiwifi.js"]
+            "js": ["js/octopiwifi.js"],
+            "css": ["css/octopiwifi.css"],
         }
 
     # ~~ Functions
+
+    def list_nm_connections(self):
+        nmcli_list_raw = subprocess.Popen(["sudo", "nmcli", "--fields", "name,type", "--terse", "con", "show"], stdout=subprocess.PIPE)
+        nmcli_list, err = nmcli_list_raw.communicate()
+        nmcli_array = []
+
+        for line in nmcli_list.decode("utf-8").rsplit("\n"):
+            if ":" in line:
+                connection = line.split(":")
+                if connection[1] == "802-11-wireless" and connection[0] != "OctoPiWifi":
+                    nmcli_array.append(connection[0])
+
+        return nmcli_array
 
     def scan_wifi_networks(self):
         iwlist_raw = subprocess.Popen(["sudo", "iwlist", "scan"], stdout=subprocess.PIPE)
@@ -69,6 +90,14 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
                     ap_array.append(ap_ssid)
 
         return ap_array
+
+    def delete_nm_connection(self, ssid):
+        try:
+            os.system(f"sudo nmcli con delete \"{ssid}\"")
+            return flask.jsonify(success=f"Deleted nm connection: {ssid}")
+        except exception as e:
+            self._logger.error(f"Error deleting nm connection: {e}")
+            return flask.jsonify(error=f"Error deleting nm connection: {e}")
 
     def create_nm_connection(self, ssid, wifi_key):
         try:
