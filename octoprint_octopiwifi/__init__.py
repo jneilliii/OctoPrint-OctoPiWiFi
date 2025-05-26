@@ -73,7 +73,7 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
         for line in nmcli_list.decode("utf-8").rsplit("\n"):
             if ":" in line:
                 connection = line.split(":")
-                if connection[1] == "802-11-wireless" and connection[0] not in ["OctoPiWifi", "wifi"]:
+                if connection[1] == "802-11-wireless" and connection[0] not in ["OctoPiWiFi", "wifi"]:
                     nmcli_array.append(connection[0])
 
         return nmcli_array
