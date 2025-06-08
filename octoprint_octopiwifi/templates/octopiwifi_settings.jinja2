@@ -23,8 +23,8 @@
     <div id="saved_connections" class="row-fluid" data-bind="foreach: saved_connections">
         <div class="row-fluid">
             <div class="btn-group">
-                <button class="btn btn-primary btn-small" type="button" data-bind="click: $parent.activate_wifi, disable: $parent.processing"><i class="fa fa-check"></i></button>
-                <button class="btn btn-danger btn-small" type="button" data-bind="click: $parent.remove_wifi, disable: ($parent.processing || $data === 'OctoPiWiFi')"><i class="fa fa-trash-alt"></i></button>
+                <button class="btn btn-primary btn-small" type="button" data-bind="click: $parent.activate_wifi, disable: $parent.processing" title="{{ _('Activate Connection') }}"><i class="fa fa-check"></i></button>
+                <button class="btn btn-danger btn-small" type="button" data-bind="click: $parent.remove_wifi, disable: ($parent.processing || $data === 'OctoPiWiFi')" title="{{ _('Delete Connection') }}"><i class="fa fa-trash-alt"></i></button>
             </div>
             <span data-bind="text: $data"></span>
         </div>
