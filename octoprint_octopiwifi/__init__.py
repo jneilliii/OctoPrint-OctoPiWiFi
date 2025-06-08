@@ -136,7 +136,7 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
     def get_update_information(self):
         return {
             "octopiwifi": {
-                "displayName": "OctoPiWifi",
+                "displayName": "OctoPiWiFi",
                 "displayVersion": self._plugin_version,
 
                 # version check: github repository
@@ -151,7 +151,7 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
         }
 
 
-__plugin_name__ = "OctoPiWifi"
+__plugin_name__ = "OctoPiWiFi"
 __plugin_pythoncompat__ = ">=3,<4"  # Only Python 3
 
 
