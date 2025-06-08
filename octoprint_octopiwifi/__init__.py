@@ -25,7 +25,7 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
         return True
 
     def get_api_commands(self):
-        return {'create_nm_connection': ["ssid", "wifi_key"], 'delete_nm_connection': ["ssid"], 'set_ap_host_mode': [], 'set_ap_client_mode': ["ssid"],
+        return {'create_nm_connection': ["ssid", "wifi_key"], 'delete_nm_connection': ["ssid"], 'set_ap_client_mode': ["ssid"],
                 'update_wpa': ["wpa_key"]}
 
     def on_api_get(self, request):
@@ -39,8 +39,6 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
     def on_api_command(self, command, data):
         if command == "create_nm_connection":
             return self.create_nm_connection(data["ssid"], data["wifi_key"])
-        elif command == "set_ap_host_mode":
-            return self.set_ap_host_mode()
         elif command == "set_ap_client_mode":
             return self.set_ap_client_mode(data["ssid"])
         elif command == "update_wpa":
@@ -73,7 +71,7 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
         for line in nmcli_list.decode("utf-8").rsplit("\n"):
             if ":" in line:
                 connection = line.split(":")
-                if connection[1] == "802-11-wireless" and connection[0] not in ["OctoPiWiFi", "wifi"]:
+                if connection[1] == "802-11-wireless":
                     nmcli_array.append(connection[0])
 
         return nmcli_array
@@ -117,11 +115,13 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
             self._logger.error(f"Error creating nm connection: {e}")
             return flask.jsonify(error=f"Error creating nm connection: {e}")
 
-    def set_ap_host_mode(self):
-        os.system("sudo nmcli con up OctoPiWiFi")
-
     def set_ap_client_mode(self, ssid):
-        os.system(f"sudo nmcli con up \"{ssid}\"")
+        try:
+            os.system(f"sudo nmcli con up \"{ssid}\"")
+            return flask.jsonify(success=f"Enabled nm connection: {ssid}")
+        except exception as e:
+            self._logger.error(f"Error enabling connection {ssid}: {e}")
+            return flask.jsonify(error=f"Error enabling connection {ssid}: {e}")
 
     def update_wpa(self, wpa_key):
         if not wpa_key == "":

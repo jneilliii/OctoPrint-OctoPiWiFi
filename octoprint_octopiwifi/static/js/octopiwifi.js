@@ -85,6 +85,24 @@ $(function() {
         };
 
         // TODO: add manual switching function
+        self.activate_wifi = function(ssid) {
+            self.processing(true);
+            self.action_message("Enabling "+ssid+"...please wait");
+            OctoPrint.simpleApiCommand("octopiwifi", "set_ap_client_mode", {
+                "ssid": ssid
+            }).done(function(data) {
+                self.processing(false);
+                if (data.success) {
+                    self.action_message(data.success);
+                    setTimeout(self.action_message, 5000, "");
+                    self.refresh_saved_connections();
+                } else if(data.error) {
+                    self.action_message(data.error);
+                } else {
+                    self.action_message("");
+                }
+            });
+        };
     }
 
     OCTOPRINT_VIEWMODELS.push({
