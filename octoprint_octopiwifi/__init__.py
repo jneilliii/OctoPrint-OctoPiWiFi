@@ -142,11 +142,11 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
                 # version check: github repository
                 "type": "github_release",
                 "user": "jneilliii",
-                "repo": "OctoPrint-OctoPiWifi",
+                "repo": "OctoPrint-OctoPiWiFi",
                 "current": self._plugin_version,
 
                 # update method: pip
-                "pip": "https://github.com/jneilliii/OctoPrint-OctoPiWifi/archive/{target_version}.zip",
+                "pip": "https://github.com/jneilliii/OctoPrint-OctoPiWiFi/archive/{target_version}.zip",
             }
         }
 
