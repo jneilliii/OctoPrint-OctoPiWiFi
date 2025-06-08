@@ -26,6 +26,9 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
     def get_wizard_version(self):
         return 1
 
+    def is_wizard_required(self):
+        return True
+
     # ~~ SimpleApiPlugin
 
     def is_api_adminonly(self):
