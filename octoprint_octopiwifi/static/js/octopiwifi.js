@@ -103,18 +103,15 @@ $(function() {
             });
         };
 
-        self.onBeforeWizardTabChange = function(next, current) {
-            if(next == ""){
-                self.onSettingsShown();
-            } else {
-                console.log(next);
-            }
+        self.onWizardDetails = function(response){
+            self.onSettingsShown();
+            $("#wizard_plugin_octopiwifi_link").insertAfter("#wizard_firstrun_start_link");
         };
     }
 
     OCTOPRINT_VIEWMODELS.push({
         construct: OctopiwifiViewModel,
-        dependencies: ["settingsViewModel" ],
-        elements: ["#settings_plugin_octopiwifi"]
+        dependencies: ["settingsViewModel", "wizardViewModel"],
+        elements: ["#settings_plugin_octopiwifi", "#wizard_plugin_octopiwifi"]
     });
 });

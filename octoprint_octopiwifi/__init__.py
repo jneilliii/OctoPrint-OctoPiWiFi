@@ -4,6 +4,7 @@ import octoprint.plugin
 import os
 import flask
 import subprocess
+from octoprint.util.platform import is_os_compatible
 
 
 class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
