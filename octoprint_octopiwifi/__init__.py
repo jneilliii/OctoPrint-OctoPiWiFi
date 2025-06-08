@@ -74,7 +74,7 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
                 if connection[1] == "802-11-wireless":
                     nmcli_array.append(connection[0])
 
-        return nmcli_array
+        return nmcli_array.sort()
 
     def scan_wifi_networks(self):
         iwlist_raw = subprocess.Popen(["sudo", "iwlist", "scan"], stdout=subprocess.PIPE)
@@ -87,7 +87,7 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
                 if ap_ssid != "" and ap_ssid not in ap_array:
                     ap_array.append(ap_ssid)
 
-        return ap_array
+        return ap_array.sort()
 
     def delete_nm_connection(self, ssid):
         try:
