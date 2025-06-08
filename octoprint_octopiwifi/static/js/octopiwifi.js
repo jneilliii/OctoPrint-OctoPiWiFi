@@ -84,7 +84,6 @@ $(function() {
             });
         };
 
-        // TODO: add manual switching function
         self.activate_wifi = function(ssid) {
             self.processing(true);
             self.action_message("Enabling "+ssid+"...please wait");
@@ -102,6 +101,14 @@ $(function() {
                     self.action_message("");
                 }
             });
+        };
+
+        self.onBeforeWizardTabChange = function(next, current) {
+            if(next == ""){
+                self.onSettingsShown();
+            } else {
+                console.log(next);
+            }
         };
     }
 

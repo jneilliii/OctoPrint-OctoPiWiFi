@@ -10,6 +10,7 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
                        octoprint.plugin.AssetPlugin,
                        octoprint.plugin.TemplatePlugin,
                        octoprint.plugin.SimpleApiPlugin,
+                       octoprint.plugin.WizardPlugin,
                        ):
 
     # ~~ SettingsPlugin mixin
@@ -18,6 +19,11 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
         return {
             # put your plugin's default settings here
         }
+
+    # ~~ WizardPlugin
+
+    def get_wizard_version(self):
+        return 1
 
     # ~~ SimpleApiPlugin
 
