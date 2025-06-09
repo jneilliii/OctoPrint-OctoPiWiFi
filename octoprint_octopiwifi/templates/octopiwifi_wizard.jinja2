@@ -1,1 +1,5 @@
+<h3 data-bind="visible: settingsViewModel.settings.server.firstRun()">OctoPiWiFi <small>{{ _('Version') }} {{ plugin_octopiwifi_plugin_version }}</small><div class="pull-right" data-bind="text: message"></div></h3>
+<div class="well">
+    If you need to change from AP mode (you are currently connected to OctoPiWifi) please add the connection below and then press the check button next to its name to activate. Once activated you will lose your connection here and will need to reconnect to OctoPrint's web interface on the new network.
+</div>
 {% include "octopiwifi_settings.jinja2" %}
