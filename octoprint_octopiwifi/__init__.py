@@ -5,6 +5,7 @@ import os
 import flask
 import subprocess
 from octoprint.access.permissions import Permissions, ADMIN_GROUP
+from flask_babel import gettext
 
 
 class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
