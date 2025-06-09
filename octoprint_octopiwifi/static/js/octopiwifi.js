@@ -104,8 +104,9 @@ $(function() {
         };
 
         self.onWizardDetails = function(response){
-            self.onSettingsShown();
             $("#wizard_plugin_octopiwifi_link").insertAfter("#wizard_firstrun_start_link");
+            self.available_networks(response.octopiwifi.details.available_networks);
+            self.saved_connections(response.octopiwifi.details.saved_connections);
         };
     }
 

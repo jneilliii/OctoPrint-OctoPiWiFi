@@ -4,7 +4,7 @@ import octoprint.plugin
 import os
 import flask
 import subprocess
-from octoprint.util.platform import is_os_compatible
+from octoprint.access.permissions import Permissions, ADMIN_GROUP
 
 
 class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
@@ -29,16 +29,21 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
     def is_wizard_required(self):
         return True
 
-    # ~~ SimpleApiPlugin
+    def get_wizard_details(self):
+        wizard_data = {'saved_connections': self.list_nm_connections(), 'available_networks': self.scan_wifi_networks()}
+        return wizard_data
 
-    def is_api_adminonly(self):
-        return True
+    # ~~ SimpleApiPlugin
 
     def get_api_commands(self):
         return {'create_nm_connection': ["ssid", "wifi_key"], 'delete_nm_connection': ["ssid"], 'set_ap_client_mode': ["ssid"],
                 'update_wpa': ["wpa_key"]}
 
     def on_api_get(self, request):
+        if not Permissions.PLUGIN_OCTOPIWIFI_MANAGE.can():
+            if not self._settings.global_get_boolean(["server", "firstRun"]):
+                return flask.make_response("Insufficient rights", 403)
+
         if request.args.get("list_nm_connections"):
             return flask.jsonify(saved_connections=self.list_nm_connections())
         elif request.args.get("scan_wifi_networks"):
@@ -47,6 +52,10 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
             return flask.jsonify(error="Invalid request")
 
     def on_api_command(self, command, data):
+        if not Permissions.PLUGIN_OCTOPIWIFI_MANAGE.can():
+            if not self._settings.global_get_boolean(["server", "firstRun"]):
+                return flask.make_response("Insufficient rights", 403)
+
         if command == "create_nm_connection":
             return self.create_nm_connection(data["ssid"], data["wifi_key"])
         elif command == "set_ap_client_mode":
@@ -94,7 +103,7 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
         for line in ap_list.decode("utf-8").rsplit("\n"):
             if "ESSID" in line:
                 ap_ssid = line[27:-1]
-                if ap_ssid != "" and ap_ssid not in ap_array:
+                if ap_ssid != "" and ap_ssid not in ap_array and not ap_ssid.startswith("\\\\"):
                     ap_array.append(ap_ssid)
 
         ap_array.sort()
@@ -141,6 +150,16 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
         else:
             os.system("sudo nmcli con modify OctoPiWiFi wifi-sec.key-mgmt none")
 
+    def get_additional_permissions(self, *args, **kwargs):
+        return [
+            dict(key="MANAGE",
+                 name="Manage WiFi",
+                 description=gettext("Allows management of WiFi connections."),
+                 roles=["admin"],
+                 dangerous=False,
+                 default_groups=[ADMIN_GROUP])
+        ]
+
     # ~~ Softwareupdate hook
 
     def get_update_information(self):
@@ -171,5 +190,6 @@ def __plugin_load__():
 
     global __plugin_hooks__
     __plugin_hooks__ = {
-        "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
+        "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information,
+        "octoprint.access.permissions": __plugin_implementation__.get_additional_permissions
     }
