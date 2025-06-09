@@ -104,7 +104,7 @@ class OctopiwifiPlugin(octoprint.plugin.SettingsPlugin,
         for line in ap_list.decode("utf-8").rsplit("\n"):
             if "ESSID" in line:
                 ap_ssid = line[27:-1]
-                if ap_ssid != "" and ap_ssid not in ap_array and not ap_ssid.startswith("\\\\"):
+                if ap_ssid != "" and ap_ssid not in ap_array and not ap_ssid.startswith("\\"):
                     ap_array.append(ap_ssid)
 
         ap_array.sort()
